@@ -70,4 +70,4 @@ It focuses particularly on the impact of becoming 30 or more days late, which is
 
 *   **Backend not running:** Check terminal output for errors when running `python app.py`. Ensure Flask and Flask-CORS are installed.
 *   **Frontend not displaying results:** Open browser developer console (F12). Check "Console" and "Network" tabs. Look for failed requests to `http://127.0.0.1:5001/api/calculate_late_impact`. Ensure backend is running and accessible on port 5001. Check CORS errors.
-*   **Calculation Errors:** If the backend returns a 400 error, check input values (non-negative numbers, integer for days late).
+*   **Calculation Errors:** If the backend returns a 400 error, check input values (non-negative numbers, integer for days late)
