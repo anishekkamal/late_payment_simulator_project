@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Late Payment Impact Simulator</title>
+    <link rel="stylesheet" href="static/css/style.css">
+</head>
+<body>
+
+    <div class="container">
+        <h1>Late Payment Impact Simulator</h1>
+        <p>See the potential consequences of missing a credit card payment.</p>
+
+        <div class="disclaimer">
+            <strong>Disclaimer:</strong> This is an estimate. Actual fees, credit score impact, and other consequences vary depending on your specific card agreement, issuer, state laws, payment history, and overall credit profile. Credit score impacts are estimates based on typical scenarios.
+        </div>
+
+        <form id="impact-form">
+            <div class="form-group">
+                <label for="card-balance">Current Card Balance ($):</label>
+                <input type="number" id="card-balance" step="0.01" min="0" required>
+            </div>
+            <div class="form-group">
+                <label for="card-apr">Card APR (%):</label>
+                <input type="number" id="card-apr" step="0.01" min="0" required>
+            </div>
+            <div class="form-group">
+                <label for="days-late">Days Payment Is Late:</label>
+                <input type="number" id="days-late" step="1" min="0" required>
+                <small>Note: Credit bureaus are typically notified after 30 days late. Impacts are more severe at 30+ days.</small>
+            </div>
+
+            <button type="submit">Simulate Impact</button>
+        </form>
+
+        <div id="results" class="results hidden">
+             <div id="error-message" class="error-message hidden">
+                <!-- Error messages will be displayed here -->
+             </div>
+
+             <h2>Estimated Impact</h2>
+
+             <div class="impact-details">
+                <p>Estimated Late Fee: <span id="fee-estimate">-</span></p>
+                <p>Estimated Credit Score Drop: <span id="score-drop-estimate">-</span></p>
+                <p>Major Credit Report Impact? <strong id="major-credit-impact">-</strong></p>
+             </div>
+
+             <h3>Potential Consequences:</h3>
+             <ul id="consequences-list">
+                 <!-- Consequences added by JS -->
+             </ul>
+
+            <!-- Visual "Domino Effect" Placeholder -->
+            <div class="domino-effect-viz">
+                <h4>The Domino Effect on Your Finances:</h4>
+                <div class="domino-chain" id="domino-chain">
+                    <div class="domino" data-impact="fee">
+                         <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cGF0aCBkPSJNMjU2IDhDMTE5IDggOCAxMTkgOCAyNTZjMCAxMzcgMTExIDI0OCAyNDggMjQ4czI0OC0xMTEgMjQ4LTI0OEM1MDQgMTE5IDM5MyA4IDI1NiA4em05MCAzNTJjLTkuNyAxLTExLjkgNC4zLTEzLjEgOS41LS4xIDUtLjcgMTMuMS0xLjMgMTguMi0uNSAxMy0xLjUgMzQuOC0xLjcgNTIuMS0uNyAzOS42LTI1LjUgNzAtNTguMiA3MS43LTI2LjUgMS40LTUyLjYtMTguMi01OS0zOC4yLTUuNC0xNi4zLTYuNC01MC42LTcuNy02Mi42LS44LTYuOC0yLjktMzguOS02LjEtNzMuMi03LjMtNzcuMS0zNC40LTEyNC40LTg0LjQtMTQwLjEtNDkuOS0xNS43LTEwMS41LTEwLjctMTMyLjIgOC0yOS44IDE3LjctNDEuOSA0OS4xLTM0LjEgNzguMiA2LjggMjUuOSA2NC4zIDcyLjkgODYuNSA4Mi4xIDIwLjcgOSAxMS4yIDIuMSAxMS43IDIzLjEgMy45IDE2LjgtLjYgMjEuMy0xLjIgMjcuMy0xLjMgMTMuMS0xLjYgMzEuOC0xLjcgNTUuOC0uMiAyMi43LS43IDQ2LjEtLjcgNTguNiAwIDIuMy0uNiA1LjUtMS41IDcuNi0uMy42LTEuMSAyLjQtMS4zIDMuMS41IDIuNCAxLjUgNC45IDMuNiA2LjEuNy40IDEuNy44IDIuOCAxbTM4LjEtMTM2Yy0uMS0yLTEuNS0yLjgtMy43LTIuOC0zLjkgMCA0LjktLjcgMy43IDIuOHoiLz48L3N2Zz4=" alt="Late Fee Icon">
+                         <p>Late Fees</p>
+                    </div>
+                    <div class="domino" data-impact="score">
+                         <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1NzYgNTEyIj48cGF0aCBkPSJNNTE3IDExMS41TDMzOC42IDI5LjFjLTcuNS02LjktMTcuNi05LjktMjcuNy04LjgtMTYuMyAxLjUtMzAuOCA5LjUtMzkuOCA2LjlzLTEyLjUtOS4xLTE4LjktMTMuOS04LjUtOC0xMy4xLTMuMy02LjMgOS43LTExLjYgMjMuMi0xNSA4LjMtMjEuMyA4LjMtNi4zLTEuOC04LjUtNy44LTE1LjMtOC40LTE3LjgtNC42LTUuMiAxLjItOS40IDQuNi01LjcgMTYuNy01LjcgNDEuMi0uMyA2Mi43IDguOSAzNi41IDkuNiAxMTMuNi03My44IDEyNC44LTk3LjYgMTIuMS0yNi43LTIzLjEtNjEuOC01NC40LTY4LjktMjQuNC01LjUtNDkuOSAxLjctNzAuMiAxOS45LTIxLjIgMTkuNi0zNC4zIDQ1LjQtMzUuOCA3MC43LTEuOSAzMi44IDUuNSA1OC43IDE3LjYgNzkuNiA5LjcgMTcuMiAyMC44IDMyLjEgMzAuOSA0Mi4zIDI1LjEgMjUuNSA0OC43IDQ5LjYgNjcuNSA3MC4yIDIxLjggMjQuNyAzOS4xIDM5IDQ5LjggNDguMS02Ni4xLTguOS0xMzMuMS0xMi4xLTIwMC05LjYtNjcuNyAyLjYtMTMyLjIgMTEuNi0xOTEuOCAzMC40LTU5LjggMTktMTA4LjggNDQtMTQyLjYgNzkuMi0zMy41IDM1LjEtNTIuMiA3OS45LTUyLjYgMTI2LjMtLjcgMTY4LjEgMTMxLjEgMzA1LjMgMjkyLjggMzA1LjcgMTYxLjcuMyAyOTMuMy0xMjguMyAyOTMuMi0yODguMyAwLTMwLjktNC4zLTU5LTExLjktODUuNnoiLz48L3N2Z34=" alt="Credit Score Icon">
+                         <p>Credit Score Drop</p>
+                    </div>
+                     <div class="domino" data-impact="penalty-apr">
+                         <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NDAgNTEyIj48cGF0aCBkPSJNNTYgNDQ4SDI0Yy0xMy4zIDAtMjQtMTAuNy0yNC0yNHYtMzJjMC0xNy43IDE0LjMtMzIgMzItMzJoMzJjMTcuNyAwIDMyIDE0LjMgMzIgMzJ2MzJjMCAxMy4zLTEwLjcgMjQtMjQgMjR6bTU4NC0yNHYtMzJjMC0xNy43LTE0LjMtMzItMzItMzJoLTMzLjZjLTM0LjQgMC02Ny4xIDE2LjUtODcuOSAzNS4xLTIwLjQgMTcuOS00Ni4xIDI3LjQtNzMuNSAyNy45LTYzLjEgMS4xLTEyMS4xLTUwLjktMTI0LjUtMTE0LjQtNC41LTg0LjEgNjYuMi0xNTMuMiAxNTAuMy0xNTcuNyA0My40LTIuMyA4NS4yIDE1LjIgMTE3LjIgNDcuMkw1MzEgMTc3LjljMTIuNSAxMi41IDEyLjUgMzIuOCAwIDQ1LjMtMTIuNSAxMi41LTMyLjggMTIuNS00NS4zIDBMNDAwIDIwMi44YzYtNi4yIDEyLjctOS41IDE5LjQtOS45IDE4LjctMS4xIDMzLjUgMTQuOSAzNC42IDMzLjZjNC4xIDc3LjEtNTMuOCA3OC4yLTU1LjggNzguMi0xMy44IDAtMjUuNy0xMS45LTI1LjgtMjYuOS0uNC0yNi42IDI1LjktMzkuOCAzNS4xLTQ3LjkgMjkuNi0yNi42IDU2LjEtNTYuMSA3Ny42LTg1LjEgNDcuMi02NC45IDU2LjYtMTQ4LjggMjUuNi0yMjcuNy0xNC0zNS4xLTM4LjEtNjUuOS03MC40LTkwLjgtMzEuMi0yMy44LTY4LjMtMzcuNC0xMDcuMS00MC44LTY5LjktNi4xLTEzNy42IDIwLjctMTg4LjggNzAuNC00OS44IDQ5LjgtNzYuOCAxMTgtODAuOSA5MC44LTQyLjQgMTEyLjQtMzEgMjQ2LjcgMjcuMiAzMzguMSAyOS4zIDQ2LjEgNjkgODUuMSA5MS40IDEwNi45IDI2LjYgMjYuMiA1Mi42IDQ3LjIgNzUgNjIuMSAzNC4xIDIyLjQgNjcuNSAzNi4xIDEwMy41IDM1LjkgMTcuMi0uMSA0OC42LTkuNyA3MC41LTI2LjUgMjAuNy0xNi4yIDM5LTQwIDQ4LjYtNjUuMkw0MDcgMzk2LjRjMTIuNS0xMi41IDMyLjgtMTIuNSA0NS4zIDBjMTIuNSAxMi41IDEyLjUgMzIuOCAwIDQ1LjNMNTA0LjEgNDQyYy01LjUgNS40LTExLjUgOS45LTE3LjggMTMuMkg2MDAuNmMxMy4zIDAgMjQtMTAuNyAyNC0yNHoiLz48L3N2Z34=" alt="Penalty APR Icon">
+                         <p>Penalty APR</p>
+                    </div>
+                     <div class="domino" data-impact="loan-difficulty">
+                         <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NDAgNTEyIj48cGF0aCBkPSJNNjQgNDQ4Yy04LjggMC0xNiA3LjItMTYgMTZ2MzJjMCA4LjggNy4yIDE2IDE2IDE2aDUxMmMyMS4yIDAgMzkuNS0xNS41IDQyLjktMzYuMSAxMi43LTc2LjEgMzguNy0xOTkuNSAxNjUtMzE1LjEtNy4xLTE0LjYtMTUuNy0yOS4xLTI2LjItNDIuNC00NS01Ni42LTEwOC4yLTg5LjgtMTc2LjQtOTcuMi01Ny45LTYuMy0xMTYuNyA3LjMtMTY3LjkgMzcuMS01MC4xIDI5LjktOTEuOCAxMDYuOS05MyAxNzUuOS0uNyA0MS43IDE5LjYgNzkuMiA1My4xIDEwNS43IDI5LjggMjMuMiA2OC40IDM2LjcgMTA5LjYgMzYuNCAyMy42LS4yIDQ3LjctMi45IDcxLjEtNi45IDIuOSAxLjUgNS42IDIuOSA4LjUgNC40IDI0LjIgMTkuOCAzNS4yIDQ4LjUgMzIuNyA3Ni42LS45IDEwLjctNS45IDE5LjMtMTIuMSAyNC43LTYuNSA1LjctMTUuNyA4LjctMjUuOSA4LjMtMy43LS4xLTcuNC0uNi0xMS0xLjQtMzcuNS04LjUtNjkuMS0yNS4yLTg1LjYtNDYuNy0xMy0xNi43LTIwLjQtMzYuMy0yNC01OC43LTMuMi0xOS45LTguOS01NC44LTIxLjUtNzIuMy00LjgtNi44LTExLjctMTYuNy0xNS43LTIzLjUtNS44LTIuMS0xMS44LTQuMy0xNy44LTYuNS00Ny44LTE3LjMtOTcuMy02LjUtMTQzLjIgMjguNi01NC42IDQwLjMtODMuMiAxMDUuNy04My44IDE3Mi43LS41IDU5LjQgMTUuNyAxMTYuNyA0NC4zIDE2Ny4zbC00NC4zIDMzNi4xLTIuMiAxNy42em0xMDYuMS0xMDYuMWMtMjEuOC0xNS44LTQ2LjItMjYuNS03Mi4zLTMxLjUgMy4zLTQxLjggMTYuNC04MS4yIDMyLjQtMTE2LjMgMTguOC00MiA0Mi4yLTc5LjggNjcuNC0xMTMuNSAxMy43LTIxLjcgMjYuMi00NC43IDM1LTcxLjcgMy4yLTkuOCAyMS4zLTE4LjQgMzUuNy0xOC42IDEzLjItLjIgMjQuNS03LjcgMzAuMy0xNy42IDIuNC00LjEgNC42LTguMyA2LjctMTIuNSAxNi4xLTMyLjMgNDUuMi00OS4xIDc2LjctNDAuOSAxNy4zIDQuNSAzMi42IDE1LjEgNDQuMSAyOC43IDIyLjYgMjYuOSAzNS44IDU5IDM2LjkgOTMuNiAxLjIgNDEuNS0xMy41IDgxLjctMzkuNyAxMTcuMi0xNi4xIDIyLjYtMzQuOSA0MS43LTU2LjcgNTYuNi01Ny44IDM5LjEtMTI3LjcgNTkuNi0xOTkuOCA1OS45eiIvPjwvc3ZnPg==" alt="Difficulty Getting Loans Icon">
+                         <p>Loan Difficulty</p>
+                    </div>
+                    <div class="domino" data-impact="debt-spiral">
+                         <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cGF0aCBkPSJNMjU2IDhDMTE5IDggOCAxMTkgOCAyNTZzMTExIDI0OCAyNDggMjQ4IDI0OC0xMTEgMjQ4LTI0OFMzOTMgOCAyNTYgOHptNjQgMzYwYy02LjIgMTItMTUuNyAyMS40LTI3LjMgMjYuNC0xOC43IDcuOS00Mi40IDguMS02Mi44IDIuMi01LjEtMS41LTEwLjEtMy41LTE1LjEtNS44LTIwLjItOS4yLTM4LjQtMjcuMS01MS40LTQ4LjUtMTcuOC0yOS4xLTI3LjctNjQtMjcuNS05OS44LjEtMzQuNiA5LjgtNjguMyAyNy4xLTk3LjcgMjAuNC0zMy41IDQ4LjktNTkuOSA4MS41LTY5LjUgNDAuMy0xMS44IDgyLjQtMTAuOCA1MjkuNS0zIC0xNS44IDIuNC0zMC45IDYuMy00NSA4LjcgMjguOSAxNC43IDUzLjEgMzYuMyA3MC43IDYxLjEgMTQuMyAxOS42IDIyLjcgNDEuNyAyNS4yIDY0LjcgMS45IDE3LjYtLjcgMzUuNy01LjggNTIuMS03LjEgMjIuNy0xOC43IDQxLjQtMzguMiA1MS4zLTguOSAxMC0xOS44IDE1LjUtMzEuMyAxNy0xMi40IDEuNS0yNS40IDIuNi0zOC42IDMuNC01LjkgLjQtMTEuOC0uNy0xNy43LTEuNS0yMi42LTItMzkuOS0xNS44LTQ0LjMtMzcuMS00LjEtMjAuMyAxMi44LTM4LjUgMzIuNC00Mi44IDE5LjYtNC4yIDQxLjYgNi45IDQ2LjggMjYuOCAyLjEgOC0uMiAxNi4yLTEuOCAyNC4yLTUuNCAyOS40LTI1LjggNDUuNC02MC4xIDQ2LjYtMzEuOCAxLjEtNTguMS0yMS40LTY1LjUtNTIuOS03LjgtMzIuOCAzLjgtNjYuMyAyOC44LTg5LjcgMi4xLTIuMiA0LjItNC4yIDYuNi02LjIgMTcuMi0xNC45IDM5LjEtMjUuNyA2My4yLTMxLjYgMzEuNy03LjUgNjUuMi01LjQgOTMuMSA1LjIgMjkuMyAxMC45IDU0LjUgMzEuNiA3MS4xIDU4LjggMTguMyAyOS45IDI4IDYzLjUgMjcuMyA5OC4xLTEuMyA2My4xLTMwLjcgMTIyLjktODQuOCAxNjEuMi0xMy43IDkuNi0yNy45IDE4LjEtNDIuMyAyNS40LTEuNy45LTQuNSAyLjctNi4yIDMtLjggMS4xLTEuNiAyLjMtMi40IDMuNC01LjkgOC40LTE1LjIgMTUuNS0yNS4xIDE4LTExLjMgMi45LTIyLjcgNC4zLTM0LjMgNC43eiIvPjwvc3ZnPg==" alt="Debt Spiral Icon">
+                         <p>Long-term Debt Issues</p>
+                    </div>
+                </div>
+                <p class="domino-explanation">
+                    (Watch how the consequences stack up, especially after 30 days late)
+                </p>
+            </div>
+
+             <!-- Disclaimer below results too -->
+             <div class="disclaimer">
+                <strong>Disclaimer:</strong> This is an estimate. Actual fees, credit score impact, and other consequences vary depending on your specific card agreement, issuer, state laws, payment history, and overall credit profile. Credit score impacts are estimates based on typical scenarios. Consult your cardholder agreement and a financial advisor for personalized advice.
+            </div>
+
+        </div>
+
+
+    </div>
+
+    <script src="static/js/script.js"></script>
+</body>
+</html>
